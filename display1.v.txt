@@ -1,0 +1,86 @@
+module display1(
+    input key,
+    input clear,
+    input [9:0] pressed,
+    output reg [3:0] out0,
+    output reg [3:0] out1,
+    output reg [3:0] out2,
+    output reg [3:0] out3,
+    output reg [6:0] display0,
+    output reg [6:0] display1,
+    output reg [6:0] display2,
+    output reg [6:0] display3
+);
+
+always @( posedge key or posedge clear) begin
+    if (clear) begin
+        
+        out0 <= 4'b0000;
+        out1 <= 4'b0000;
+        out2 <= 4'b0000;
+        out3 <= 4'b0000;
+        display0 <= 7'b0000000;
+        display1 <= 7'b0000000;
+        display2 <= 7'b0000000;
+        display3 <= 7'b0000000;
+    end else if ( out3 == 4'b0000)begin
+       
+        out3 <= out2;
+        out2 <= out1;
+        out1 <= out0;
+        display3 <= display2;
+        display2 <= display1;
+        display1 <= display0;
+
+       
+        case (pressed)
+            10'b0000000001: begin
+                display0 = 7'b1111110; //0 
+                out0 = 4'b0000;
+            end
+            10'b0000000010: begin
+                display0 = 7'b0110000; //1
+                out0 = 4'b0001;
+            end
+            10'b0000000100: begin
+                display0 = 7'b1101101; //2
+                out0 = 4'b0010;
+            end
+            10'b0000001000: begin
+                display0 = 7'b1111001; //3
+                out0 = 4'b0011;
+            end
+            10'b0000010000: begin
+                display0 = 7'b0110011; //4
+                out0 = 4'b0100;
+            end
+            10'b0000100000: begin 
+                display0 = 7'b1011011; //5
+                out0 = 4'b0101;
+            end
+            10'b0001000000: begin
+                display0 = 7'b1011111; //6
+                out0 = 4'b0110;
+            end
+            10'b0010000000: begin
+                display0 = 7'b1110000; //7 
+                out0 = 4'b0111;
+            end
+            10'b0100000000: begin
+                display0 = 7'b1111111; //8  
+                out0 = 4'b1000;
+            end 
+            10'b1000000000: begin
+                display0 = 7'b1111011; //9 
+                out0 = 4'b1001;
+            end 
+            default: begin
+                // Default durumu
+                display0 = 7'b0000000;
+                out0 = 4'b0000;
+            end 
+        endcase
+    end
+end
+
+endmodule

@@ -1,0 +1,86 @@
+module turnike(
+  input say2,
+  input calculate,
+  input clear,
+  input [3:0] hangislem,
+  output reg en_num1,
+  output reg en_num2,
+  output reg disp_topla,
+  output reg disp_cikar,
+  output reg disp_bol,
+  output reg disp_carp,
+  output reg topla,
+  output reg cikar,
+  output reg bol,
+  output reg carp
+);
+
+always @(posedge clear or posedge calculate or posedge say2) begin
+  if (clear) begin
+    en_num1 <= 1;
+    en_num2 <= 0;
+disp_topla<= 0;
+disp_cikar<= 0;
+disp_bol<= 0;
+disp_carp<= 0;
+
+topla <=0;
+cikar <=0;
+bol<= 0;
+carp<= 0;
+
+
+  end
+  else if (say2) begin
+    en_num1 <= 0;
+    en_num2 <= 1;
+case (hangislem)
+    4'b0001: begin
+      disp_topla = 1;
+      disp_cikar = 0;
+      disp_bol = 0;
+      disp_carp = 0;
+
+    end 
+
+    4'b0010: begin
+      disp_topla = 0;
+      disp_cikar = 1;
+      disp_bol = 0;
+      disp_carp = 0;
+    end 
+
+    4'b0100: begin
+      disp_topla = 0;
+      disp_cikar = 0;
+      disp_bol = 1;
+      disp_carp = 0;
+    end 
+
+    4'b1000: begin
+      disp_topla = 0;
+      disp_cikar = 0;
+      disp_bol = 0;
+      disp_carp = 1;
+    end 
+
+    default: begin
+      disp_topla = 0;
+      disp_cikar = 0;
+      disp_bol = 0;
+      disp_carp = 0;
+    end 
+  endcase
+  end
+  else if (calculate && ! en_num1) begin
+    en_num1 <= 0;
+    en_num2 <= 0;
+      topla <= disp_topla ;
+      cikar <= disp_cikar;
+      bol <= disp_bol ;
+      carp <= disp_carp ;
+   
+  end
+end
+
+endmodule

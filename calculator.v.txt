@@ -1,0 +1,121 @@
+module calculator(
+    input topla,
+    input cikar,
+    input bol,
+    input carp,
+
+    input clear,
+    input [3:0] s1_d0,
+    input [3:0] s1_d1,
+    input [3:0] s1_d2,
+    input [3:0] s1_d3,
+    input [3:0] s2_d0,
+    input [3:0] s2_d1,
+    input [3:0] s2_d2,
+    input [3:0] s2_d3,
+    output reg [3:0] res0,
+    output reg [3:0] res1,
+    output reg [3:0] res2,
+    output reg [3:0] res3,
+    output reg error,
+    output reg sign,
+    output reg disp
+);
+
+    reg [3:0] carry;
+    reg [13:0] op1; 
+    reg [13:0] op2;
+    reg [13:0] resondort;
+    reg borrow;
+
+    always @ (posedge cikar or posedge bol or posedge carp or posedge topla or posedge clear) begin
+        if (clear) begin
+            res0 <= 4'b0;
+            res1 <= 4'b0;
+            res2 <= 4'b0;
+            res3 <= 4'b0;
+            error <= 0;
+            carry <= 4'b0;
+            sign <= 0;
+            disp <= 0;
+            op1 <= 14'b0;
+            op2 <= 14'b0;
+            resondort <= 14'b0;
+        end
+        else begin
+            if (topla) begin
+                carry[0] = (s1_d0 + s2_d0) > 9 ? 1 : 0;
+                carry[1] = (s1_d1 + s2_d1 + carry[0]) > 9 ? 1 : 0;
+                carry[2] = (s1_d2 + s2_d2 + carry[1]) > 9 ? 1 : 0;
+                carry[3] = (s1_d3 + s2_d3 + carry[2]) > 9 ? 1 : 0;
+
+                res0 = (s1_d0 + s2_d0) % 10;
+                res1 = (s1_d1 + s2_d1 + carry[0]) % 10;
+                res2 = (s1_d2 + s2_d2 + carry[1]) % 10;
+                res3 = (s1_d3 + s2_d3 + carry[2]) % 10;
+                disp = 1;
+
+                error = carry[3];
+            end
+        else if (cikar) begin
+op1 = s1_d0 + s1_d1 * 10 + s1_d2 * 100 + s1_d3 * 1000;
+op2 = s2_d0 + s2_d1 * 10 + s2_d2 * 100 + s2_d3 * 1000;
+         if (op1 >= op2) begin
+                resondort = op1 - op2;
+                res0 = resondort % 10;
+                res1 = (resondort % 100) / 10;
+                res2 = (resondort % 1000) / 100;
+                res3 = (resondort % 10000) / 1000;
+                sign = 0;
+            end else begin
+                resondort = op2 - op1;
+                res0 = resondort % 10;
+                res1 = (resondort % 100) / 10;
+                res2 = (resondort % 1000) / 100;
+                res3 = (resondort % 10000) / 1000;
+                sign = 1;
+            end
+disp = 1;
+            end else if (carp) begin
+            op1 = s1_d0 + s1_d1 * 10 + s1_d2 * 100 + s1_d3 * 1000;
+            op2 = s2_d0 + s2_d1 * 10 + s2_d2 * 100 + s2_d3 * 1000;
+
+            resondort = op1 * op2;
+
+            res0 = resondort % 10;
+            res1 = (resondort % 100) / 10;
+            res2 = (resondort % 1000) / 100;
+            res3 = (resondort % 10000) / 1000;
+
+            op1 = resondort % 10000;
+
+            if (op1 >= 0) begin
+                error = 0;
+                disp = 1;
+            end else begin
+                error = 1;
+                disp = 0;
+            end 
+          end else if (bol) begin
+            op1 = s1_d0 + s1_d1 * 10 + s1_d2 * 100 + s1_d3 * 1000;
+            op2 = s2_d0 + s2_d1 * 10 + s2_d2 * 100 + s2_d3 * 1000;
+
+            if (op2 == 0) begin
+                // Bölme sıfıra bölünemez
+                error = 1;
+                disp = 0;
+            end else begin
+                resondort = op1 / op2;
+               
+                res0 = resondort % 10;
+                res1 = (resondort % 100) / 10;
+                res2 = (resondort % 1000) / 100;
+                res3 = (resondort % 10000) / 1000;
+
+                error = 0;
+                disp = 1;
+            end
+          end
+        end
+    end
+endmodule
